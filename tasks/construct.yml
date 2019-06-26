@@ -1,0 +1,63 @@
+---
+platform: linux
+
+inputs:
+- name: stembuild # contains the state for the vm
+- name: lgpo # contains the product configuration file
+
+params:
+  vcenter_ca_certs: ((vcenter-ca-certs))
+  vcenter_url: ((vcenter-url))
+  vcenter_username: ((vcenter-username))
+  vcenter_password: ((vcenter-password))
+  vm_inventory_path: ((vm-inventory-path))
+  vm_ip: ((vm-ip))
+  vm_password: ((vm-password))
+  vm_username: ((vm-username))
+  
+run:
+  path: bash
+  args:
+  - "-c"
+  - |
+    cat /var/version && echo ""
+    set -eux
+
+    export STEMBUILD_FILE
+    STEMBUILD_FILE="$(find stembuild/stembuild-linux-* 2>/dev/null | head -n1)"
+
+    if [ -z "$STEMBUILD_FILE" ]; then
+      echo "No stembuild file found in input."
+      echo "Contents of stembuild input:"
+      ls -al stembuild
+      exit 1
+    fi
+
+    chmod +x ${STEMBUILD_FILE}
+
+    if [ -z "lgpo/LGPO.zip" ]; then
+      echo "No zip file found in input."
+      echo "Contents of lgpo input:"
+      ls -al lgpo
+      exit 1
+    fi
+    
+    #LGPO needs to be in the working folder (where stembuild is called fom)
+    cp lgpo/LGPO.zip ./LGPO.zip
+
+    if [ -z "./LGPO.zip" ]; then
+      echo "LGPO needs to be in working dir."
+      echo "Contents of current dir:"
+      ls -al
+      exit 1
+    fi
+
+    ./$STEMBUILD_FILE construct \
+      -vm-ip config "${vm_ip}" \
+      -vm-username "${vm_username}" \
+      -vm-password "${vm_password}"  \
+      -vcenter-url "${vcenter_url}" \
+      -vcenter-username "${vcenter_username}" \
+      -vcenter-password "${vcenter_password}" \
+      -vm-inventory-path "${vm_inventory_path}" \
+      -vcenter-ca-certs "${vcenter_ca_certs}"

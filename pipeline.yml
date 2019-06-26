@@ -1,0 +1,142 @@
+resource_types:
+- name: pivnet
+  type: docker-image
+  source:
+    repository: pivotalcf/pivnet-resource
+    tag: latest-final
+
+- name: gcs
+  type: docker-image
+  source:
+    repository: frodenas/gcs-resource
+    
+- name: azure-blobstore
+  type: docker-image
+  source:
+    repository: pcfabr/azure-blobstore-resource
+
+resources:
+- name: task-image
+  type: docker-image
+  source:
+    repository: ubuntu:latest
+
+###########################################
+#STEMBUILD RELEASE SOURCE (uncomment an option)
+#- name: stembuild-release
+#  type: pivnet #https://github.com/pivotal-cf/pivnet-resource
+#  source:
+#    api_token: ((pivnet_token))
+#    product_slug: stemcells-windows-server
+#    product_version: ((OS_VERSION)).(.*)
+#    sort_by: semver
+
+- name: stembuild-release
+  type: github-release #https://github.com/concourse/github-release-resource
+  source:
+    owner: cloudfoundry-incubator
+    repository: https://github.com/cloudfoundry-incubator/stembuild
+    tag_filter: ((OS_VERSION)).(.*) #we only want a certain operating system version
+
+###########################################
+#LGPO LOCATION (uncomment an option)
+- name: lgpo-location
+  type: s3 #https://github.com/concourse/s3-resource
+  source:
+    access_key_id: ((s3.access_key_id))
+    secret_access_key: ((s3.secret_access_key))
+    bucket: ((s3.bucket.lgpo))
+    #endpoint: ((s3.endpoint))
+    versioned_file: lgpo.zip
+
+#- name: lgpo-location
+#  type: gcs #https://github.com/frodenas/gcs-resource
+#  source:
+#    json_key: ((gcs.json-key))
+#    bucket: ((gcs.bucket.stemcell))
+#    versioned_file: lgpo.zip
+
+#- name: lgpo-location
+#  type: azure-blobstore #https://github.com/pivotal-cf/azure-blobstore-resource
+#  source:
+#    storage_account_name: ((azure.storage_account_name))
+#    storage_account_key: ((azure.storage_account_key))
+#    container: ((azure.container.lgpo))
+#    versioned_file: lgpo.zip
+
+###########################################
+#STEMCELL STORAGE (uncomment an option)
+- name: stemcell-store
+  type: s3 #https://github.com/concourse/s3-resource
+  source:
+    access_key_id: ((s3.access_key_id))
+    secret_access_key: ((s3.secret_access_key))
+    bucket: ((s3.bucket.stemcell))
+   #endpoint: ((s3.endpoint))
+    regexp: bosh-stemcell-(.*)-vsphere.*\.tgz
+
+#- name: stemcell-store
+#  type: gcs #https://github.com/frodenas/gcs-resource
+#  source:
+#    json_key: ((gcs.json-key))
+#    bucket: ((gcs.bucket.stemcell))
+#    regexp: bosh-stemcell-(.*)-vsphere.*\.tgz
+
+#- name: stemcell-store
+#  type: azure-blobstore #https://github.com/pivotal-cf/azure-blobstore-resource
+#  source:
+#    storage_account_name: ((azure.storage_account_name))
+#    storage_account_key: ((azure.storage_account_key))
+#    container: ((azure.container.stemcell))
+#    regexp: bosh-stemcell-(.*)-vsphere.*\.tgz
+
+jobs:
+- name: construct
+  serial: true
+  plan:
+    - get: task-image
+    - get: lgpo-location
+    - get: stembuild-release
+      trigger: true
+      params:
+        globs:
+          - stembuild-linux-*
+    - task: construct
+      image: task-image
+      file: tasks/construct.yml
+      input_mapping:
+        stembuild: stembuild-release
+        lgpo: lgpo-location
+      params:
+        vcenter_ca_certs: ((vcenter-ca-certs))
+        vcenter_url: ((vcenter-url))
+        vcenter_username: ((vcenter-username))
+        vcenter_password: ((vcenter-password))
+        vm_inventory_path: ((vm-inventory-path))
+        vm_ip: ((vm-ip))
+        vm_password: ((vm-password))
+        vm_username: ((vm-username))
+
+- name: package
+  serial: true
+  plan:
+    - get: task-image
+    - get: stembuild-release
+      passed: [construct]
+      params:
+        globs:
+          - stembuild-linux-*
+    - task: construct
+      image: task-image
+      file: tasks/package.yml
+      input_mapping:
+        stembuild: stembuild-release
+      params:
+        vcenter_ca_certs: ((vcenter-password))
+        vcenter_url: ((vcenter-url))
+        vcenter_username: ((vcenter-username))
+        vcenter_password: ((vcenter-password))
+        vm_inventory_path: ((vm-inventory-path))
+    - put: stemcell-store
+      params:
+        file: stemcell/*.tgz

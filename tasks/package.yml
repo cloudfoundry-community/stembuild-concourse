@@ -1,0 +1,56 @@
+---
+platform: linux
+
+inputs:
+- name: stembuild # contains the state for the vm
+
+params:
+  vcenter_ca_certs: ((vcenter-ca-certs))
+  vcenter_url: ((vcenter-url))
+  vcenter_username: ((vcenter-username))
+  vcenter_password: ((vcenter-password))
+  vm_inventory_path: ((vm-inventory-path))
+
+outputs:
+- name: stemcell
+
+run:
+  path: bash
+  args:
+  - "-c"
+  - |
+    cat /var/version && echo ""
+    set -eux
+
+    export STEMBUILD_FILE
+    STEMBUILD_FILE="$(find stembuild/stembuild-linux-* 2>/dev/null | head -n1)"
+
+    if [ -z "$STEMBUILD_FILE" ]; then
+      echo "No stembuild file found in input."
+      echo "Contents of stembuild input:"
+      ls -al stembuild
+      exit 1
+    fi
+
+    chmod +x ${STEMBUILD_FILE}
+
+    ./$STEMBUILD_FILE package \
+      -vcenter-url "${vcenter_url}" \
+      -vcenter-username "${vcenter_username}" \
+      -vcenter-password "${vcenter_password}" \
+      -vm-inventory-path "${vm_inventory_path}" \
+      -vcenter-ca-certs "${vcenter_ca_certs}"
+
+    STEMCELL_FILE="$(find *.tgz 2>/dev/null | head -n1)"
+
+    if [ -f "$STEMCELL_FILE" ]; then
+      mv $STEMCELL_FILE stemcell/$STEMCELL_FILE
+      echo "All Done! Stemcell created."
+    else
+      echo "No stemcell file found."
+      echo "Contents of dir:"
+      ls -al .
+      exit 1
+    fi
+
+    exit 0
