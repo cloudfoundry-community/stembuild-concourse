@@ -43,4 +43,8 @@ To set up the pipeline in Concourse...
     --load-vars-from ./vars.yml
   ```
 
+1. [TODO] Copy in LGPO
+
+1. [TODO] Set up git repo with tasks
+
 1. You're ready to see the magic happen!

@@ -1,18 +1,19 @@
 
 ###########################################
 #STEMBUILD RELEASE SOURCE
-OS_VERSION: '2019' #required, 1709|1803|2019
-pivnet_token: #optional, only needed is using pivnet(network.pivotal.io) and not github
+OS_VERSION: '2019' #1709|1803|2019
+pivnet_token: 
 
 ###########################################
-#STEMCELL STORAGE (uncomment corresponding resource in pipeline.yml)
+#STEMCELL STORAGE
 s3:
   access_key_id: 
   secret_access_key: 
   bucket:
-    stemcell:
+    stemcell: 
     lgpo: 
-  endpoint: 
+    tasks: 
+  #endpoint: 
 
 gcs:
   json-key: 
@@ -31,15 +32,17 @@ azure:
 #BASE STEMCELL PARAMS
 #https://github.com/cloudfoundry-incubator/stembuild
 #https://docs.pivotal.io/pivotalcf/windows/create-vsphere-stemcell-automatically.html
-
-vcenter-url:
-vcenter-username:
-vcenter-password:
-
 #https://pubs.vmware.com/vsphere-6-5/index.jsp?topic=%2Fcom.vmware.vcli.getstart.doc%2FGUID-9AF8E0A7-1A64-4839-AB97-2F18D8ECB9FE.html
-vcenter-ca-certs: |-
 
-vm-inventory-path: #/<datacenter>/vm/<vm-folder>/<vm-name>
+vcenter-url: 
+vcenter-username: 
+vcenter-password: 
+vcenter-ca-certs: |-
+  -----BEGIN CERTIFICATE-----
+  REPLACE ME
+  -----END CERTIFICATE-----
+
+vm-inventory-path:  #/<datacenter>/vm/<vm-folder>/<vm-name>
 vm-ip: 
-vm-password:
-vm-username: #administrator
+vm-password: 
+vm-username: 

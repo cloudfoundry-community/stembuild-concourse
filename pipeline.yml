@@ -16,13 +16,14 @@ resource_types:
     repository: pcfabr/azure-blobstore-resource
 
 resources:
+- name: ubuntu-image
+  type: docker-image
+  source: { repository: ubuntu }
+  
 - name: pipeline-tasks
   type: git
   source:
-    uri: https://gitlab.stupidapplications.local/ddieruf/stembuild-concourse.git
-    password: 123asd##
-    username: ddieruf
-    skip_ssl_verification: true
+    uri: https://github.com/pivotal/stembuild-concourse.git
     branch: master
 
 #- name: stembuild-release
@@ -43,11 +44,27 @@ resources:
 - name: lgpo
   type: s3
   source:
-    access_key_id: 'minio'
-    bucket: stemcell-concourse
-    endpoint: http://minio.stupidapplications.local:9000
-    secret_access_key: 'minio123'
-    regexp: 0.0.(.*)/LGPO.zip
+    access_key_id: ((s3.access_key_id))
+    bucket: ((s3.bucket.lgpo))
+    secret_access_key: ((s3.secret_access_key))
+    endpoint: ((s3.endpoint))
+    versioned_file: lgpo.zip
+    #regexp: 0.0.(.*)/LGPO.zip
+
+#- name: lgpo
+#  type: gcs
+#  source:
+#    json_key: ((gcs.json-key))
+#    bucket: ((gcs.bucket.stemcell))
+#    versioned_file: lgpo.zip
+
+#- name: lgpo
+#  type: azure-blobstore
+#  source:
+#    storage_account_name: ((azure.storage_account_name))
+#    storage_account_key: ((azure.storage_account_key))
+#    container: ((azure.container.lgpo))
+#    versioned_file: lgpo.zip
 
 - name: stemcell-store
   type: s3
@@ -58,13 +75,23 @@ resources:
     endpoint: ((s3.endpoint))
     regexp: bosh-stemcell-(.*)-vsphere.*\.tgz
 
-- name: ubuntu-image
-  type: docker-image
-  source: { repository: ubuntu }
+#- name: stemcell-store
+#  type: gcs
+#  source:
+#    json_key: ((gcs.json-key))
+#    bucket: ((gcs.bucket.stemcell))
+#    regexp: bosh-stemcell-(.*)-vsphere.*\.tgz
+
+#- name: stemcell-store
+#  type: azure-blobstore
+#  source:
+#    storage_account_name: ((azure.storage_account_name))
+#    storage_account_key: ((azure.storage_account_key))
+#    container: ((azure.container.stemcell))
+#    regexp: bosh-stemcell-(.*)-vsphere.*\.tgz
 
 jobs:
 - name: construct
-  serial: true
   plan:
     - get: ubuntu-image
     - get: pipeline-tasks
@@ -91,7 +118,6 @@ jobs:
         vm_username: ((vm-username))
 
 - name: package
-  serial: true
   plan:
     - get: ubuntu-image
     - get: pipeline-tasks
