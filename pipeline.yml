@@ -23,9 +23,7 @@ resources:
 - name: pipeline-tasks
   type: git
   source:
-    uri: ((tasks.uri))
-    username: ((tasks.username))
-    password: ((tasks.password))
+    uri: https://github.com/pivotal/stembuild-concourse.git
     branch: master
 
 #- name: stembuild-release
