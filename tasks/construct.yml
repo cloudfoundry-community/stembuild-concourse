@@ -22,6 +22,7 @@ run:
   - |
     cat /var/version && echo ""
     set -eux
+    #set -e
 
     export STEMBUILD_FILE
     STEMBUILD_FILE="$(find stembuild/stembuild-linux-* 2>/dev/null | head -n1)"
@@ -52,7 +53,7 @@ run:
       exit 1
     fi
 
-    #write cert to a file
+    #write the cert to file
     (echo ${vcenter_ca_certs} | awk '
       match($0,/- .* -/){
         val=substr($0,RSTART,RLENGTH)
@@ -60,6 +61,7 @@ run:
         gsub(OFS,ORS,val)
         print substr($0,1,RSTART) ORS val ORS substr($0,RSTART+RLENGTH-1)}') > cert.crt
 
+    #Start construct
     ./$STEMBUILD_FILE construct \
       -vm-ip "${vm_ip}" \
       -vm-username "${vm_username}" \
@@ -70,12 +72,12 @@ run:
       -vm-inventory-path "${vm_inventory_path}" \
       -vcenter-ca-certs cert.crt
 
+    #Once the construct process exits, the VM is still doing work. We will know it's done with it shuts off. The following will download the govc cli and poll the VM for it's power status.
+
     apt-get update && apt-get -y install curl
-    #Get compatible version to testing environment
     curl -L https://github.com/vmware/govmomi/releases/download/v0.20.0/govc_linux_amd64.gz | gunzip > /usr/local/bin/govc
     chmod +x /usr/local/bin/govc
-    
-    #wait for VM to shut off
+
     export GOVC_URL=${vcenter_url}
     export GOVC_USERNAME=${vcenter_username}
     export GOVC_PASSWORD=${vcenter_password}
@@ -83,10 +85,8 @@ run:
     #export GOVC_INSECURE=0
     cmd=$(echo $(govc vm.info -vm.ipath=${vm_inventory_path} | grep 'Power state:'))
 
-    while true; do
-      if [[ $cmd == *"poweredOff" ]]; then
-        break
-      fi
+    #wait for VM to shut off
+    while ($cmd == *"poweredOn"*); do
       sleep 2m
     done
 
