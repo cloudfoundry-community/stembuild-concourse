@@ -52,6 +52,9 @@ run:
       exit 1
     fi
 
+    #write cert to a file
+    echo ${vcenter_ca_certs} > cert
+
     ./$STEMBUILD_FILE construct \
       -vm-ip config "${vm_ip}" \
       -vm-username "${vm_username}" \
@@ -60,4 +63,4 @@ run:
       -vcenter-username "${vcenter_username}" \
       -vcenter-password "${vcenter_password}" \
       -vm-inventory-path "${vm_inventory_path}" \
-      -vcenter-ca-certs "${vcenter_ca_certs}"
+      -vcenter-ca-certs ./cert

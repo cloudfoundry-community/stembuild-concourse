@@ -16,97 +16,62 @@ resource_types:
     repository: pcfabr/azure-blobstore-resource
 
 resources:
-- name: task-image
-  type: docker-image
+- name: pipeline-tasks
+  type: git
   source:
-    repository: ubuntu:latest
-
-###########################################
-#STEMBUILD RELEASE SOURCE (uncomment an option)
-#- name: stembuild-release
-#  type: pivnet #https://github.com/pivotal-cf/pivnet-resource
-#  source:
-#    api_token: ((pivnet_token))
-#    product_slug: stemcells-windows-server
-#    product_version: ((OS_VERSION)).(.*)
-#    sort_by: semver
+    uri: https://gitlab.stupidapplications.local/ddieruf/stembuild-concourse.git
+    password: 123asd##
+    username: ddieruf
+    skip_ssl_verification: true
+    branch: master
 
 - name: stembuild-release
-  type: github-release #https://github.com/concourse/github-release-resource
+  type: github-release
   source:
     owner: cloudfoundry-incubator
-    repository: https://github.com/cloudfoundry-incubator/stembuild
-    tag_filter: ((OS_VERSION)).(.*) #we only want a certain operating system version
+    repository: stembuild
+    tag_filter: ((OS_VERSION)).(.*)
 
-###########################################
-#LGPO LOCATION (uncomment an option)
-- name: lgpo-location
-  type: s3 #https://github.com/concourse/s3-resource
+- name: lgpo
+  type: s3
   source:
-    access_key_id: ((s3.access_key_id))
-    secret_access_key: ((s3.secret_access_key))
-    bucket: ((s3.bucket.lgpo))
-    #endpoint: ((s3.endpoint))
-    versioned_file: lgpo.zip
+    access_key_id: 'minio'
+    bucket: stemcell-concourse
+    endpoint: http://minio.stupidapplications.local:9000
+    secret_access_key: 'minio123'
+    regexp: 0.0.(.*)/LGPO.zip
 
-#- name: lgpo-location
-#  type: gcs #https://github.com/frodenas/gcs-resource
-#  source:
-#    json_key: ((gcs.json-key))
-#    bucket: ((gcs.bucket.stemcell))
-#    versioned_file: lgpo.zip
-
-#- name: lgpo-location
-#  type: azure-blobstore #https://github.com/pivotal-cf/azure-blobstore-resource
-#  source:
-#    storage_account_name: ((azure.storage_account_name))
-#    storage_account_key: ((azure.storage_account_key))
-#    container: ((azure.container.lgpo))
-#    versioned_file: lgpo.zip
-
-###########################################
-#STEMCELL STORAGE (uncomment an option)
 - name: stemcell-store
-  type: s3 #https://github.com/concourse/s3-resource
+  type: s3
   source:
     access_key_id: ((s3.access_key_id))
     secret_access_key: ((s3.secret_access_key))
     bucket: ((s3.bucket.stemcell))
-   #endpoint: ((s3.endpoint))
+    endpoint: ((s3.endpoint))
     regexp: bosh-stemcell-(.*)-vsphere.*\.tgz
 
-#- name: stemcell-store
-#  type: gcs #https://github.com/frodenas/gcs-resource
-#  source:
-#    json_key: ((gcs.json-key))
-#    bucket: ((gcs.bucket.stemcell))
-#    regexp: bosh-stemcell-(.*)-vsphere.*\.tgz
-
-#- name: stemcell-store
-#  type: azure-blobstore #https://github.com/pivotal-cf/azure-blobstore-resource
-#  source:
-#    storage_account_name: ((azure.storage_account_name))
-#    storage_account_key: ((azure.storage_account_key))
-#    container: ((azure.container.stemcell))
-#    regexp: bosh-stemcell-(.*)-vsphere.*\.tgz
+- name: ubuntu-image
+  type: docker-image
+  source: { repository: ubuntu }
 
 jobs:
 - name: construct
   serial: true
   plan:
-    - get: task-image
-    - get: lgpo-location
+    - get: ubuntu-image
+    - get: pipeline-tasks
+    - get: lgpo
     - get: stembuild-release
       trigger: true
       params:
         globs:
           - stembuild-linux-*
     - task: construct
-      image: task-image
-      file: tasks/construct.yml
+      file: pipeline-tasks/tasks/construct.yml
+      image: ubuntu-image
       input_mapping:
         stembuild: stembuild-release
-        lgpo: lgpo-location
+        lgpo: lgpo
       params:
         vcenter_ca_certs: ((vcenter-ca-certs))
         vcenter_url: ((vcenter-url))
@@ -120,15 +85,16 @@ jobs:
 - name: package
   serial: true
   plan:
-    - get: task-image
+    - get: ubuntu-image
+    - get: pipeline-tasks
     - get: stembuild-release
       passed: [construct]
       params:
         globs:
           - stembuild-linux-*
     - task: construct
-      image: task-image
-      file: tasks/package.yml
+      file: pipeline-tasks/tasks/package.yml
+      image: ubuntu-image
       input_mapping:
         stembuild: stembuild-release
       params:
