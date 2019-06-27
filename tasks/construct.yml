@@ -83,10 +83,9 @@ run:
     export GOVC_PASSWORD=${vcenter_password}
     export GOVC_TLS_CA_CERTS=cert.crt
     #export GOVC_INSECURE=0
-    cmd=$(echo $(govc vm.info -vm.ipath=${vm_inventory_path} | grep 'Power state:'))
 
     #wait for VM to shut off
-    while ($cmd == *"poweredOn"*); do
+     while [[ $(echo $(govc vm.info -vm.ipath=${vm_inventory_path} | grep 'Power state:')) = "Power state: poweredOn"  ]]; do
       sleep 2m
     done
 

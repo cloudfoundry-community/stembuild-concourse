@@ -9,10 +9,13 @@ The stemcell that is output from this pipeline can be used with Pivotal Applicat
 
 The Concourse worker that runs these tasks needs to have access to `https://github.com` and `https://network.pivotal.io`. If your workers aren't allowed public access, you can madify the pipeline to "feed" the assets that are normally downloaded.
 
-This pipeline is retrieving the stembuild cli from PivNet and is set to automatically fire when ever a new version is released.
+## Keeping Stemcells Patched
+Every month Microsoft releases patches (updates) for it's operating systems. Known as patch Tuesday. The stembuild team tests the cli against these new patches every month and releases a new minor version of the tool. Issues and found and fixed before releasing. Updating the base VM after patch tuesday and cloning it is a best practice. Then let this pipeline fire when a new minor version of the cli is release to create the patched stemcell. This trigger is already built in to the pipeline.
+
+Details about monthly stemcell upgrade can be found in the [creating vsphere stemcell with stembuild](https://docs.pivotal.io/pivotalcf/2-6/windows/create-vsphere-stemcell-automatically.html#upgrade-stemcell) documentation. 
 
 ## Getting Started
-The stembuild cli expects the VM to be in a specific state. To get there, follow the documentation for [creating vsphere stemcell with stembuild](https://docs.pivotal.io/pivotalcf/windows/create-vsphere-stemcell-automatically.html) through Step 3. Once you have the cloned VM and it is powered on, use this pipeline to convert the VM to a stemcell.
+The stembuild cli expects the VM to be in a specific state. To get there, follow the documentation for [creating vsphere stemcell with stembuild](https://docs.pivotal.io/pivotalcf/2-6/windows/create-vsphere-stemcell-automatically.html) through Step 3. Once you have the cloned VM and it is powered on, use this pipeline to convert the VM to a stemcell.
 
 To set up the pipeline in Concourse...
 
