@@ -21,8 +21,8 @@ run:
   - "-c"
   - |
     cat /var/version && echo ""
-    set -eux
-    #set -e
+    #set -eux
+    set -e
 
     export STEMBUILD_FILE
     STEMBUILD_FILE="$(find stembuild/stembuild-linux-* 2>/dev/null | head -n1)"
