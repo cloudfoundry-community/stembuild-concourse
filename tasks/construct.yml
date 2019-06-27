@@ -56,7 +56,7 @@ run:
     echo ${vcenter_ca_certs} > cert
 
     ./$STEMBUILD_FILE construct \
-      -vm-ip config "${vm_ip}" \
+      -vm-ip "${vm_ip}" \
       -vm-username "${vm_username}" \
       -vm-password "${vm_password}"  \
       -vcenter-url "${vcenter_url}" \
