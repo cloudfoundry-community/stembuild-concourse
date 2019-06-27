@@ -26,11 +26,19 @@ resources:
     branch: master
 
 - name: stembuild-release
-  type: github-release
+  type: pivnet #https://github.com/pivotal-cf/pivnet-resource
   source:
-    owner: cloudfoundry-incubator
-    repository: stembuild
-    tag_filter: ((OS_VERSION)).(.*)
+    api_token: ((pivnet_token))
+    product_slug: stemcells-windows-server
+    product_version: ((OS_VERSION)).(.*)
+    sort_by: semver
+
+#- name: stembuild-release
+#  type: github-release
+#  source:
+#    owner: cloudfoundry-incubator
+#    repository: stembuild
+#    tag_filter: ((OS_VERSION)).(.*)
 
 - name: lgpo
   type: s3

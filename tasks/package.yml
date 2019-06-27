@@ -35,14 +35,19 @@ run:
     chmod +x ${STEMBUILD_FILE}
     
     #write cert to a file
-    echo ${vcenter_ca_certs} > cert
+    (echo ${vcenter_ca_certs} | awk '
+      match($0,/- .* -/){
+        val=substr($0,RSTART,RLENGTH)
+        gsub(/- | -/,"",val)
+        gsub(OFS,ORS,val)
+        print substr($0,1,RSTART) ORS val ORS substr($0,RSTART+RLENGTH-1)}') > cert.crt
 
     ./$STEMBUILD_FILE package \
       -vcenter-url "${vcenter_url}" \
       -vcenter-username "${vcenter_username}" \
       -vcenter-password "${vcenter_password}" \
       -vm-inventory-path "${vm_inventory_path}" \
-      -vcenter-ca-certs ./cert
+      -vcenter-ca-certs cert.crt
 
     STEMCELL_FILE="$(find *.tgz 2>/dev/null | head -n1)"
 
