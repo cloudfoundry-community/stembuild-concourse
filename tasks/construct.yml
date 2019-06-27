@@ -58,7 +58,7 @@ run:
         val=substr($0,RSTART,RLENGTH)
         gsub(/- | -/,"",val)
         gsub(OFS,ORS,val)
-        print substr($0,1,RSTART) ORS val ORS substr($0,RSTART+RLENGTH-1)}') > cert.crt2
+        print substr($0,1,RSTART) ORS val ORS substr($0,RSTART+RLENGTH-1)}') > cert.crt
 
     ./$STEMBUILD_FILE construct \
       -vm-ip "${vm_ip}" \
@@ -68,4 +68,4 @@ run:
       -vcenter-username "${vcenter_username}" \
       -vcenter-password "${vcenter_password}" \
       -vm-inventory-path "${vm_inventory_path}" \
-      -vcenter-ca-certs $PWD/cert
+      -vcenter-ca-certs cert.crt
