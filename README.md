@@ -19,6 +19,7 @@ The stembuild cli expects the VM to be in a specific state. To get there, follow
   The CA certs for vcenter are not optional. You can retrieve the cert by following [this vmware doc](https://pubs.vmware.com/vsphere-6-5/index.jsp?topic=%2Fcom.vmware.vcli.getstart.doc%2FGUID-9AF8E0A7-1A64-4839-AB97-2F18D8ECB9FE.html). 
 
 1. Using the [fly cli](https://concourse-ci.org/fly.html), [login](https://concourse-ci.org/fly.html#fly-login) to concourse, and [set](https://concourse-ci.org/setting-pipelines.html#fly-set-pipeline) the pipeline with variables filled.
+
     *Powershell Set Pipeline*
     ```
     fly -t <MY-TARGET> set-pipeline `
