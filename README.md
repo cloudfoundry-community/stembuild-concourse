@@ -1,5 +1,5 @@
 # Concourse pipeline for stembuild
-A collection to tasks that implement stembuild cli.
+A collection of tasks that implement stembuild cli.
 
 ## About
 This is a [Concourse](https://concourse-ci.org) pipeline with tasks to create a Windows stemcell for Cloud Foundry, using the [stembuild cli](https://github.com/cloudfoundry-incubator/stembuild/). The stemcell can be used with Pivotal Application Service for Windows (PASW) and the windows cluster feature of Pivotal Container Service (PKS) as well.
@@ -19,7 +19,6 @@ The stembuild cli expects the VM to be in a specific state. To get there, follow
   The CA certs for vcenter are not optional. You can retrieve the cert by following [this vmware doc](https://pubs.vmware.com/vsphere-6-5/index.jsp?topic=%2Fcom.vmware.vcli.getstart.doc%2FGUID-9AF8E0A7-1A64-4839-AB97-2F18D8ECB9FE.html). 
 
 1. Using the [fly cli](https://concourse-ci.org/fly.html), [login](https://concourse-ci.org/fly.html#fly-login) to concourse, and [set](https://concourse-ci.org/setting-pipelines.html#fly-set-pipeline) the pipeline with variables filled.
-
   #### Powershell Set Pipeline
   ```
   fly -t <MY-TARGET> set-pipeline `
@@ -47,8 +46,8 @@ Every month Microsoft releases patches (updates) for it's operating systems. Kno
 
 As a best practice, try to follow this pattern:
 1. Update the base stemcell VM on patch tuesday.
-1. Once all updates are finished, shutdown and Clone the base VM. Name the clone to reflect the stembuild version, ie: 2019.3.41.
-1. When the new minor version of the cli is released, start* this pipeline to create the stemcell.
+1. Once all updates are finished, shutdown and clone the base VM. Name the clone to reflect the stembuild version that will be used, ie: 2019.3.41.
+1. When the new minor version of stembuild is released, start* this pipeline to create the stemcell.
 
 Details about monthly stemcell upgrade can be found in the [creating vsphere stemcell with stembuild](https://docs.pivotal.io/pivotalcf/2-6/windows/create-vsphere-stemcell-automatically.html#upgrade-stemcell) documentation.
 
