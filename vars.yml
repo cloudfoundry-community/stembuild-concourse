@@ -4,9 +4,9 @@
 OS_VERSION: '2019' #1709|1803|2019
 pivnet_token: 
 tasks:
-  uri: 
-  username: 
-  password: 
+  uri: https://github.com/pivotal/stembuild-concourse.git
+  username: #leave blank if using stembuild-concourse repo
+  password: #leave blank if using stembuild-concourse repo
 
 ###########################################
 #STEMCELL STORAGE
@@ -16,8 +16,7 @@ s3:
   bucket:
     stemcell: 
     lgpo: 
-    tasks: 
-  #endpoint: 
+  endpoint: #optional if not using amazon S3
 
 gcs:
   json-key: 
@@ -34,10 +33,6 @@ azure:
 
 ###########################################
 #BASE STEMCELL PARAMS
-#https://github.com/cloudfoundry-incubator/stembuild
-#https://docs.pivotal.io/pivotalcf/windows/create-vsphere-stemcell-automatically.html
-#https://pubs.vmware.com/vsphere-6-5/index.jsp?topic=%2Fcom.vmware.vcli.getstart.doc%2FGUID-9AF8E0A7-1A64-4839-AB97-2F18D8ECB9FE.html
-
 vcenter-url: 
 vcenter-username: 
 vcenter-password: 
