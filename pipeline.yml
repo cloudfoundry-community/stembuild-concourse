@@ -50,8 +50,8 @@ resources:
     bucket: ((s3.bucket.lgpo))
     secret_access_key: ((s3.secret_access_key))
     endpoint: ((s3.endpoint))
-    #versioned_file: lgpo.zip
-    regexp: 0.0.(.*)/LGPO.zip
+    versioned_file: lgpo.zip
+    #regexp: 0.0.(.*)/LGPO.zip
 
 #- name: lgpo
 #  type: gcs
