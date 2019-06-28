@@ -4,7 +4,7 @@
 OS_VERSION: '2019' #1709|1803|2019
 pivnet_token: 
 tasks:
-  uri: https://github.com/pivotal/stembuild-concourse.git
+  uri: https://github.com/cloudfoundry-community/stembuild-concourse.git
   username: #leave blank if using stembuild-concourse repo
   password: #leave blank if using stembuild-concourse repo
 
