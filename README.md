@@ -19,21 +19,21 @@ The stembuild cli expects the VM to be in a specific state. To get there, follow
   The CA certs for vcenter are not optional. You can retrieve the cert by following [this vmware doc](https://pubs.vmware.com/vsphere-6-5/index.jsp?topic=%2Fcom.vmware.vcli.getstart.doc%2FGUID-9AF8E0A7-1A64-4839-AB97-2F18D8ECB9FE.html). 
 
 1. Using the [fly cli](https://concourse-ci.org/fly.html), [login](https://concourse-ci.org/fly.html#fly-login) to concourse, and [set](https://concourse-ci.org/setting-pipelines.html#fly-set-pipeline) the pipeline with variables filled.
-  #### Powershell Set Pipeline
-  ```
-  fly -t <MY-TARGET> set-pipeline `
-    --pipeline create-windows-stemcell `
-    --config .\pipeline.yml `
-    --load-vars-from .\vars.yml
-  ```
+    *Powershell Set Pipeline*
+    ```
+    fly -t <MY-TARGET> set-pipeline `
+      --pipeline create-windows-stemcell `
+      --config .\pipeline.yml `
+      --load-vars-from .\vars.yml
+    ```
 
-  #### Bash Set Pipeline
-  ```bash
-  fly -t <MY-TARGET> set-pipeline \
-    --pipeline create-windows-stemcell \
-    --config ./pipeline.yml \
-    --load-vars-from ./vars.yml
-  ```
+    *Bash Set Pipeline*
+    ```bash
+    fly -t <MY-TARGET> set-pipeline \
+      --pipeline create-windows-stemcell \
+      --config ./pipeline.yml \
+      --load-vars-from ./vars.yml
+    ```
 
 1. Looking at the [prerequisites](https://docs.pivotal.io/pivotalcf/2-6/windows/create-vsphere-stemcell-automatically.html#prerequisites) for running stembuild, you'll notice that LGPO needs to be downloaded and put in the same working folder. The pipeline has provisions for holding the zip using either S3 compatible, Google Cloud, or Azure store. Place the downloaded zip in the chosen store and the pipeline will manage the rest.
 
