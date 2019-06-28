@@ -132,7 +132,7 @@ jobs:
       input_mapping:
         stembuild: stembuild-release
       params:
-        vcenter_ca_certs: ((vcenter-password))
+        vcenter_ca_certs: ((vcenter-ca-certs))
         vcenter_url: ((vcenter-url))
         vcenter_username: ((vcenter-username))
         vcenter_password: ((vcenter-password))
