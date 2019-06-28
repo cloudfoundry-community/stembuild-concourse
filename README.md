@@ -15,7 +15,8 @@ The stembuild cli expects the VM to be in a specific state. To get there, follow
 1. The pipeline has options of where things can be stored. Specifically S3 compatible, Google Cloud, or Azure store. The default is S3 compatible. If you would like to use a different store just comment/uncomment things in `pipeline.yml`.
 
 1. The `vars.yml` file will feed variables to the pipeline. Fill in the values appropriatly.
-  #### Vcenter certificate
+  
+  *Vcenter certificate*
   The CA certs for vcenter are not optional. You can retrieve the cert by following [this vmware doc](https://pubs.vmware.com/vsphere-6-5/index.jsp?topic=%2Fcom.vmware.vcli.getstart.doc%2FGUID-9AF8E0A7-1A64-4839-AB97-2F18D8ECB9FE.html). 
 
 1. Using the [fly cli](https://concourse-ci.org/fly.html), [login](https://concourse-ci.org/fly.html#fly-login) to concourse, and [set](https://concourse-ci.org/setting-pipelines.html#fly-set-pipeline) the pipeline with variables filled.
