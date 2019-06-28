@@ -9,6 +9,10 @@ The Concourse worker that runs these tasks needs to have access to `https://gith
 
 The stembuild cli expects the VM to be in a specific state. To get there, follow the documentation for [creating vsphere stemcell with stembuild](https://docs.pivotal.io/pivotalcf/2-6/windows/create-vsphere-stemcell-automatically.html) through Step 3. Once you have the cloned VM and it is powered on, use this pipeline to convert the VM to a stemcell.
 
+
+![Concourse screenshot](screenshot.png "Concourse screenshot")
+
+
 ## Getting Started
 1. You'll need 2 files from this repo, `pipeline.yml` and `vars.yml`. You can either clone the repo `git clone https://github.com/cloudfoundry-community/stembuild-concourse` or just grab the raw content.
 
