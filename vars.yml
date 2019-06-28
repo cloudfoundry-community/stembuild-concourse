@@ -3,6 +3,10 @@
 #STEMBUILD RELEASE SOURCE
 OS_VERSION: '2019' #1709|1803|2019
 pivnet_token: 
+tasks:
+  uri: 
+  username: 
+  password: 
 
 ###########################################
 #STEMCELL STORAGE

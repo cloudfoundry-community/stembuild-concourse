@@ -23,8 +23,10 @@ resources:
 - name: pipeline-tasks
   type: git
   source:
-    uri: https://github.com/pivotal/stembuild-concourse.git
+    uri: ((tasks.uri))
     branch: master
+    username: ((tasks.username))
+    password: ((tasks.password))
 
 #- name: stembuild-release
 #  type: pivnet #https://github.com/pivotal-cf/pivnet-resource
@@ -48,8 +50,8 @@ resources:
     bucket: ((s3.bucket.lgpo))
     secret_access_key: ((s3.secret_access_key))
     endpoint: ((s3.endpoint))
-    versioned_file: lgpo.zip
-    #regexp: 0.0.(.*)/LGPO.zip
+    #versioned_file: lgpo.zip
+    regexp: 0.0.(.*)/LGPO.zip
 
 #- name: lgpo
 #  type: gcs

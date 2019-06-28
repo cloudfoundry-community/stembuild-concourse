@@ -19,7 +19,6 @@ run:
   args:
   - "-c"
   - |
-    cat /var/version && echo ""
     set -eux
 
     export STEMBUILD_FILE
