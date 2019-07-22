@@ -9,7 +9,7 @@ resource_types:
   type: docker-image
   source:
     repository: frodenas/gcs-resource
-    
+
 - name: azure-blobstore
   type: docker-image
   source:
@@ -19,7 +19,11 @@ resources:
 - name: ubuntu-image
   type: docker-image
   source: { repository: ubuntu }
-  
+
+- name: govc-image
+  type: docker-image
+  source: { repository: ubuntu }
+
 - name: pipeline-tasks
   type: git
   source:
@@ -27,6 +31,28 @@ resources:
     branch: master
     username: ((tasks.username))
     password: ((tasks.password))
+    paths:
+    - tasks/*
+    # - Dockerfile  # Only needed if using build-image task option#2
+
+# Only need if using govc as resource from s3 (govc option#3b)
+# - name: govc
+#   type: s3
+#   source:
+#     access_key_id: ((s3.access_key_id))
+#     bucket: ((s3.bucket.lgpo))
+#     secret_access_key: ((s3.secret_access_key))
+#     endpoint: ((s3.endpoint))
+#     versioned_file: govc_linux_amd64.gz
+#     #regexp: 0.0.(.*)/govc_linux_amd64.gz
+
+# Only need if using govc as resource from github
+# - name: govc
+#   type: github-release
+#   source:
+#     repository: vmware
+#     owner: govmomi
+#     access_token: ((github_access_token))
 
 - name: stembuild-release
   type: pivnet
@@ -102,12 +128,25 @@ jobs:
       params:
         globs:
           - stembuild-linux-*
+    # Only needed if using govc as resource
+    # - get: govc
+    # Only needed if using build-image task
+    # - task: build-image
+    #   file: pipeline-tasks/tasks/build-image.yml
+    #   privileged: true  # builder-task requires privilege
+    #   input_mapping:
+    #     context: pipeline-tasks
+
     - task: construct
       file: pipeline-tasks/tasks/construct.yml
       image: ubuntu-image
+      # Only needed if using build-image task
+      # image: rootfs
       input_mapping:
         stembuild: stembuild-release
         lgpo: lgpo
+        # Only needed if using govc as resource
+        # govc: govc
       params:
         vcenter_ca_certs: ((vcenter-ca-certs))
         vcenter_url: ((vcenter-url))

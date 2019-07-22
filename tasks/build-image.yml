@@ -1,0 +1,26 @@
+---
+platform: linux
+
+image_resource:
+  type: docker-image
+  source:
+    repository: concourse/builder-task
+    tag: latest
+
+inputs:
+- name: context
+
+outputs:
+- name: image
+- name: rootfs # The directory to store the contents of the image for use in later tasks
+
+caches:
+- path: cache
+
+params:
+  REPOSITORY: stembuild-image
+  CONTEXT: context
+  BUILD_ARG_GOVC_VERSION:  # Sets the govc version to download
+
+run:
+  path: build
