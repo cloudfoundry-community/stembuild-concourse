@@ -4,6 +4,8 @@ platform: linux
 inputs:
 - name: stembuild # contains the state for the vm
 - name: lgpo # contains the product configuration file
+- name: govc # contains govc cli
+  optional: true
 
 params:
   vcenter_ca_certs: ((vcenter-ca-certs))
@@ -14,7 +16,7 @@ params:
   vm_ip: ((vm-ip))
   vm_password: ((vm-password))
   vm_username: ((vm-username))
-  
+
 run:
   path: bash
   args:
@@ -41,7 +43,7 @@ run:
       ls -al lgpo
       exit 1
     fi
-    
+
     #LGPO needs to be in the working folder (where stembuild is called fom)
     cp lgpo/LGPO.zip ./LGPO.zip
 
@@ -49,6 +51,28 @@ run:
       echo "LGPO needs to be in working dir."
       echo "Contents of current dir:"
       ls -al
+      exit 1
+    fi
+
+    # Check for the govc cli
+    if hash govc; then
+      GOVC_CLI=govc
+    else
+      GOVC_CLI="$(find govc/govc_linux_* 2>/dev/null | head -n1)"
+      if [[ -z "$GOVC_CLI" ]]; then
+        # TODO: Remove
+        # Fallback to download
+        apt-get update && apt-get -y install curl
+        curl -L https://github.com/vmware/govmomi/releases/download/v0.20.0/govc_linux_amd64.gz | gunzip > /usr/local/bin/govc
+        chmod +x /usr/local/bin/govc
+        GOVC_CLI=/usr/local/bin/govc
+      fi
+    fi
+
+    if [[ -z "$GOVC_CLI" ]]; then
+      echo "GOVC cli could not be found.  Please change docker imge to one with govc OR add govc as input."
+      echo "Contents of govc dir:"
+      ls -al govc
       exit 1
     fi
 
@@ -73,10 +97,6 @@ run:
 
     #Once the construct process exits, the VM is still doing work. We will know it's done with it shuts off. The following will download the govc cli and poll the VM for it's power status.
 
-    apt-get update && apt-get -y install curl
-    curl -L https://github.com/vmware/govmomi/releases/download/v0.20.0/govc_linux_amd64.gz | gunzip > /usr/local/bin/govc
-    chmod +x /usr/local/bin/govc
-
     export GOVC_URL=${vcenter_url}
     export GOVC_USERNAME=${vcenter_username}
     export GOVC_PASSWORD=${vcenter_password}
@@ -84,7 +104,7 @@ run:
     #export GOVC_INSECURE=0
 
     #wait for VM to shut off
-     while [[ $(echo $(govc vm.info -vm.ipath=${vm_inventory_path} | grep 'Power state:')) = "Power state: poweredOn"  ]]; do
+     while [[ $(echo $($GOVC_CLI vm.info -vm.ipath=${vm_inventory_path} | grep 'Power state:')) = "Power state: poweredOn"  ]]; do
       sleep 2m
     done
 
