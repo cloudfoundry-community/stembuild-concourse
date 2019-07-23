@@ -14,7 +14,10 @@ params:
   vm_ip: ((vm-ip))
   vm_password: ((vm-password))
   vm_username: ((vm-username))
-  
+
+  # Allows the LGPO file name to be changed
+  LGPO_FILE: LGPO*.zip
+
 run:
   path: bash
   args:
@@ -35,17 +38,20 @@ run:
 
     chmod +x ${STEMBUILD_FILE}
 
-    if [ -z "lgpo/LGPO.zip" ]; then
+    # Resolve file
+    LGPO_FILE="$(find lgpo/${LGPO_FILE} 2>/dev/null | head -n1)"
+
+    if [ -z "${LGPO_FILE}" -o ! -f "${LGPO_FILE}" ]; then
       echo "No zip file found in input."
       echo "Contents of lgpo input:"
       ls -al lgpo
       exit 1
     fi
-    
-    #LGPO needs to be in the working folder (where stembuild is called fom)
-    cp lgpo/LGPO.zip ./LGPO.zip
 
-    if [ -z "./LGPO.zip" ]; then
+    #LGPO needs to be in the working folder (where stembuild is called from)
+    cp "${LGPO_FILE}" ./LGPO.zip
+
+    if [ ! -f "./LGPO.zip" ]; then
       echo "LGPO needs to be in working dir."
       echo "Contents of current dir:"
       ls -al
