@@ -1,3 +1,6 @@
+# Deprecated!
+Please use https://github.com/cloudfoundry-community/windows-stemcell-concourse
+
 # Concourse pipeline for stembuild
 A collection of tasks that implement stembuild cli.
 
